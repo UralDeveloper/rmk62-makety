@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Макеты страниц — РМК «Регион молочный 62»</title>
+<style>
+:root{--accent:#0078C9;--accent-soft:#C7EAF9;--ink:#141414;--ink2:#525252;--muted:#878787;--line:#e7e7e7;--surface:#f5f4f2}
+*{box-sizing:border-box}
+body{margin:0;font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:48px 20px 64px}
+header{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+header img{height:48px}
+h1{margin:0;font-size:32px;line-height:1.2}
+.lead{margin:8px 0 40px;color:var(--ink2);font-size:16px;line-height:1.5}
+h2{margin:40px 0 16px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.card{display:flex;flex-direction:column;padding:24px;border-radius:20px;background:var(--surface);text-decoration:none;color:inherit;transition:background .2s,transform .2s}
+.card:hover{background:var(--accent-soft);transform:translateY(-2px)}
+.card h3{margin:0 0 8px;font-size:22px}
+.card p{margin:0 0 16px;color:var(--ink2);font-size:15px;line-height:1.5;flex:1}
+.meta{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;color:var(--muted)}
+.badge{padding:3px 10px;border-radius:999px;background:#fff;color:var(--ink)}
+.badge--ok{background:#e4f3d9}
+.open{margin-top:16px;font-weight:600;color:var(--accent)}
+.empty{color:var(--muted)}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="https://newryazan.foodloveapp.ru/wp-content/uploads/2026/02/logo_insite_white-large.webp" alt="РМК">
+    <h1>Макеты страниц</h1>
+  </header>
+  <p class="lead">Макеты новых страниц для сайта <a href="https://xn--62-1lcht.xn--p1ai" target="_blank" rel="noopener">рмк62.рф</a>. Шапка и подвал в макетах — как на сайте; пунктиром отмечено то, что ждёт решения.</p>
+  <div id="list"><p class="empty">Загрузка…</p></div>
+  <footer>РМК «Регион молочный 62» · рабочие материалы, не для индексации</footer>
+</div>
+<script>
+const MONTHS=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>{const [y,m,day]=d.split('-');return `${+day} ${['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'][m-1]} ${y}`};
+fetch('makety.json',{cache:'no-store'}).then(r=>r.json()).then(items=>{
+  items.sort((a,b)=>b.date.localeCompare(a.date));
+  const groups={};
+  for(const it of items){const k=it.date.slice(0,7);(groups[k]=groups[k]||[]).push(it);}
+  document.getElementById('list').innerHTML=Object.keys(groups).sort().reverse().map(k=>{
+    const [y,m]=k.split('-');
+    return `<h2>${MONTHS[m-1]} ${y}</h2><div class="grid">`+groups[k].map(it=>`
+      <a class="card" href="${esc(it.file)}">
+        <h3>${esc(it.title)}</h3>
+        <p>${esc(it.description)}</p>
+        <div class="meta"><span class="badge ${it.status==='согласовано'?'badge--ok':''}">${esc(it.status)}</span><span>${fmt(it.date)}</span>${it.url?`<span>${esc(it.url)}</span>`:''}</div>
+        <span class="open">Открыть макет →</span>
+      </a>`).join('')+'</div>';
+  }).join('');
+}).catch(()=>{document.getElementById('list').innerHTML='<p class="empty">Не удалось загрузить список макетов.</p>'});
+</script>
+</body>
+</html>
